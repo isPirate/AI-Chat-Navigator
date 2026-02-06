@@ -74,16 +74,18 @@
         </div>
       </div>
 
-      <div class="stats-section">
-        <h2>统计信息</h2>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-value" id="total-conversations">0</span>
-            <span class="stat-label">对话数</span>
+      <div class="settings-section">
+        <h2>设置</h2>
+        <div class="setting-item">
+          <div class="setting-info">
+            <label>展开方式</label>
+            <span class="setting-desc">选择侧边栏的展开方式</span>
           </div>
-          <div class="stat-item">
-            <span class="stat-value" id="total-messages">0</span>
-            <span class="stat-label">消息数</span>
+          <div class="setting-control">
+            <select id="expand-mode-select" class="select-input">
+              <option value="hover">鼠标悬停</option>
+              <option value="click">点击展开</option>
+            </select>
           </div>
         </div>
       </div>

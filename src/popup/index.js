@@ -10,12 +10,15 @@ function initializePopup() {
   // 检查ChatGPT页面状态
   checkChatGPTStatus();
 
-  // 加载统计数据
-  loadStatistics();
+  // 加载设置
+  loadSettings();
 
   // 绑定按钮事件
   document.getElementById('open-chatgpt').addEventListener('click', openChatGPT);
   document.getElementById('clear-data').addEventListener('click', clearAllData);
+
+  // 绑定设置变更事件
+  document.getElementById('expand-mode-select').addEventListener('change', saveExpandMode);
 }
 
 /**
@@ -49,51 +52,6 @@ async function checkChatGPTStatus() {
 }
 
 /**
- * 加载统计数据
- */
-async function loadStatistics() {
-  try {
-    const allData = await chrome.storage.local.get(null);
-    const conversations = [];
-    let totalMessages = 0;
-
-    Object.keys(allData).forEach((key) => {
-      if (key.startsWith('conversation_')) {
-        const conversation = allData[key];
-        conversations.push(conversation);
-        totalMessages += conversation.messages?.length || 0;
-      }
-    });
-
-    // 动画显示数字
-    animateValue('total-conversations', 0, conversations.length, 500);
-    animateValue('total-messages', 0, totalMessages, 500);
-  } catch (error) {
-    console.error('[AI Chat Navigator] 加载统计失败:', error);
-  }
-}
-
-/**
- * 数字动画
- */
-function animateValue(elementId, start, end, duration) {
-  const element = document.getElementById(elementId);
-  const range = end - start;
-  const increment = range / (duration / 16);
-  let current = start;
-
-  const timer = setInterval(() => {
-    current += increment;
-    if (current >= end) {
-      element.textContent = end;
-      clearInterval(timer);
-    } else {
-      element.textContent = Math.floor(current);
-    }
-  }, 16);
-}
-
-/**
  * 打开ChatGPT
  */
 function openChatGPT() {
@@ -113,14 +71,65 @@ async function clearAllData() {
 
     await chrome.storage.local.remove(keysToRemove);
 
-    // 更新统计显示
-    document.getElementById('total-conversations').textContent = '0';
-    document.getElementById('total-messages').textContent = '0';
-
     // 显示成功提示
     alert('数据已清除');
   } catch (error) {
     console.error('[AI Chat Navigator] 清除数据失败:', error);
     alert('清除数据失败，请重试');
   }
+}
+
+/**
+ * 加载设置
+ */
+async function loadSettings() {
+  try {
+    const result = await chrome.storage.local.get('expandMode');
+    const expandMode = result.expandMode || 'hover'; // 默认hover
+
+    const select = document.getElementById('expand-mode-select');
+    if (select) {
+      select.value = expandMode;
+    }
+  } catch (error) {
+    console.error('[AI Chat Navigator] 加载设置失败:', error);
+  }
+}
+
+/**
+ * 保存展开方式
+ */
+async function saveExpandMode(event) {
+  const expandMode = event.target.value;
+
+  try {
+    await chrome.storage.local.set({ expandMode });
+
+    // 显示保存成功提示
+    const settingItem = event.target.closest('.setting-item');
+    showSaveNotification(settingItem);
+  } catch (error) {
+    console.error('[AI Chat Navigator] 保存设置失败:', error);
+    alert('保存设置失败，请重试');
+  }
+}
+
+/**
+ * 显示保存成功提示
+ */
+function showSaveNotification(settingItem) {
+  // 移除已存在的通知
+  const existing = settingItem.querySelector('.save-notification');
+  if (existing) existing.remove();
+
+  // 创建通知
+  const notification = document.createElement('div');
+  notification.className = 'save-notification';
+  notification.textContent = '✓ 已保存';
+  settingItem.appendChild(notification);
+
+  // 2秒后移除
+  setTimeout(() => {
+    notification.remove();
+  }, 2000);
 }

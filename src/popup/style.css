@@ -191,12 +191,12 @@ body {
   margin-left: auto;
 }
 
-/* 统计信息 */
-.stats-section {
+/* 设置部分 */
+.settings-section {
   margin-bottom: 20px;
 }
 
-.stats-section h2 {
+.settings-section h2 {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 12px;
@@ -205,35 +205,90 @@ body {
   letter-spacing: 0.5px;
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.stat-item {
+.setting-item {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
-  padding: 16px;
-  text-align: center;
+  padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
 }
 
-.stat-value {
+.setting-info {
+  flex: 1;
+}
+
+.setting-info label {
   display: block;
-  font-size: 28px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ececec;
+  margin-bottom: 2px;
 }
 
-.stat-label {
+.setting-desc {
   display: block;
   font-size: 12px;
   color: #9b9b9b;
-  margin-top: 4px;
+}
+
+.setting-control {
+  flex-shrink: 0;
+}
+
+.select-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+  padding: 6px 12px;
+  color: #ececec;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.select-input:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.select-input:focus {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.select-input option {
+  background: #1a1a2e;
+  color: #ececec;
+}
+
+/* 保存成功提示 */
+.save-notification {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background: #10b981;
+  color: white;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 底部 */

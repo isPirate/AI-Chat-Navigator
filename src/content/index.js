@@ -7,10 +7,13 @@ class ChatNavigator {
   constructor() {
     this.messages = [];
     this.sidebar = null;
-    this.isSidebarVisible = true;
+    this.isSidebarVisible = false; // 默认折叠状态
     this.currentConversationId = this.extractConversationId();
     this.processedElements = new Set(); // 追踪已处理的消息元素
     this.checkInterval = null; // 定期检查URL变化
+    this.expandMode = 'hover'; // 展开方式: 'hover' 或 'click'，默认hover
+    this.hoverTimer = null; // hover延迟计时器
+    this.collapseTimer = null; // 折叠延迟计时器
     this.init();
   }
 
@@ -37,6 +40,9 @@ class ChatNavigator {
 
   async init() {
     console.log('[AI Chat Navigator] 初始化中...');
+
+    // 加载配置
+    await this.loadSettings();
 
     // 等待页面加载完成
     await this.waitForChatContainer();
@@ -85,6 +91,7 @@ class ChatNavigator {
     // 创建侧边栏容器
     this.sidebar = document.createElement('div');
     this.sidebar.id = 'ai-chat-navigator-sidebar';
+    this.sidebar.classList.add('collapsed'); // 默认折叠状态
     this.sidebar.innerHTML = `
       <div class="navigator-header">
         <h3>对话导航</h3>
@@ -93,6 +100,15 @@ class ChatNavigator {
             <polyline points="15 18 9 12 15 6"/>
           </svg>
         </button>
+        <!-- 折叠状态图标容器 -->
+        <div class="collapsed-icon-container" id="collapsed-icon" title="点击展开对话导航">
+          <div class="collapsed-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <span class="collapsed-badge" id="collapsed-badge">0</span>
+        </div>
       </div>
       <div class="navigator-search">
         <input type="text" id="search-input" placeholder="搜索消息内容...">
@@ -115,9 +131,65 @@ class ChatNavigator {
    * 绑定侧边栏事件
    */
   bindSidebarEvents() {
-    // 切换显示/隐藏
+    // 切换显示/隐藏按钮
     const toggleBtn = document.getElementById('toggle-navigator');
     toggleBtn.addEventListener('click', () => this.toggleSidebar());
+
+    // 折叠图标容器
+    const collapsedIcon = document.getElementById('collapsed-icon');
+
+    // 根据配置绑定不同的事件
+    if (this.expandMode === 'hover') {
+      // hover 模式：鼠标悬停展开，离开时自动折叠
+      collapsedIcon.addEventListener('mouseenter', () => {
+        if (!this.isSidebarVisible) {
+          // 清除可能存在的折叠计时器
+          if (this.collapseTimer) {
+            clearTimeout(this.collapseTimer);
+            this.collapseTimer = null;
+          }
+          // 延迟展开，避免误触
+          this.hoverTimer = setTimeout(() => {
+            this.toggleSidebar();
+          }, 200);
+        }
+      });
+
+      collapsedIcon.addEventListener('mouseleave', () => {
+        if (this.hoverTimer) {
+          clearTimeout(this.hoverTimer);
+          this.hoverTimer = null;
+        }
+      });
+
+      // 点击也可展开
+      collapsedIcon.addEventListener('click', () => {
+        if (!this.isSidebarVisible) {
+          this.toggleSidebar();
+        }
+      });
+
+      // 监听整个侧边栏的鼠标离开事件，自动折叠
+      this.sidebar.addEventListener('mouseleave', () => {
+        if (this.isSidebarVisible) {
+          // 延迟折叠，避免误操作
+          this.collapseTimer = setTimeout(() => {
+            this.toggleSidebar();
+          }, 300);
+        }
+      });
+
+      // 鼠标回到侧边栏时取消折叠
+      this.sidebar.addEventListener('mouseenter', () => {
+        if (this.collapseTimer) {
+          clearTimeout(this.collapseTimer);
+          this.collapseTimer = null;
+        }
+      });
+    } else {
+      // click 模式：只响应点击
+      collapsedIcon.addEventListener('click', () => this.toggleSidebar());
+    }
 
     // 搜索功能
     const searchInput = document.getElementById('search-input');
@@ -321,12 +393,14 @@ class ChatNavigator {
   updateSidebar() {
     const content = document.getElementById('navigator-content');
     const countEl = document.getElementById('message-count');
+    const badgeEl = document.getElementById('collapsed-badge');
 
     if (!content || !countEl) return;
 
     if (this.messages.length === 0) {
       content.innerHTML = '<div class="empty-state">暂无对话记录</div>';
       countEl.textContent = '0 条消息';
+      if (badgeEl) badgeEl.textContent = '0';
       return;
     }
 
@@ -344,6 +418,11 @@ class ChatNavigator {
     }).join('');
 
     countEl.textContent = `${this.messages.length} 条消息`;
+
+    // 更新折叠状态的徽章数量
+    if (badgeEl) {
+      badgeEl.textContent = this.messages.length > 99 ? '99+' : this.messages.length;
+    }
 
     // 绑定点击事件
     content.querySelectorAll('.message-item').forEach(item => {
@@ -457,6 +536,21 @@ class ChatNavigator {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  /**
+   * 加载设置
+   */
+  async loadSettings() {
+    try {
+      const result = await chrome.storage.local.get('expandMode');
+      if (result.expandMode && ['hover', 'click'].includes(result.expandMode)) {
+        this.expandMode = result.expandMode;
+        console.log('[AI Chat Navigator] 展开模式:', this.expandMode);
+      }
+    } catch (error) {
+      console.error('[AI Chat Navigator] 加载设置失败:', error);
+    }
   }
 }
 
