@@ -128,4 +128,4 @@ When testing changes:
 
 ## Git操作
 
-1. 进行git提交的时候不要添加额外的信息，比如说message是有什么工具生成的等这种标识，只给出代码的变动信息。
+1. 进行git提交的时候不要添加额外的信息，比如说message是有什么工具生成的等这种标识(类似：Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>)，只给出代码的变动信息。

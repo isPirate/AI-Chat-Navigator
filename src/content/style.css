@@ -1,26 +1,57 @@
 /**
  * AI Chat Navigator - Content Script Styles
+ * 参考 DeepSeek 简洁风格设计
  */
+
+:root {
+  /* 主色调 - ChatGPT 风格 */
+  --bg-sidebar: #f9f9f9;
+  --bg-item: #ffffff;
+  --bg-item-hover: #f0f0f0;
+  --bg-item-active: #e4edfd;
+
+  /* 强调色 */
+  --accent-primary: #10a37f;
+  --accent-secondary: #3964ff;
+
+  /* 文字颜色 */
+  --text-primary: #2d2d2d;
+  --text-secondary: #6b6b6b;
+  --text-muted: #999999;
+
+  /* 边框 */
+  --border-color: #e5e5e5;
+  --border-radius: 12px;
+
+  /* 阴影 */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  /* 动画 */
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 #ai-chat-navigator-sidebar {
   position: fixed;
   right: 20px;
   top: 80px;
-  width: 340px;
+  width: 320px;
   max-height: calc(100vh - 100px);
-  background: #212121;
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  background: var(--bg-sidebar);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   z-index: 9999;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  transition: all 0.3s ease;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: var(--transition);
   overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 
+/* 折叠状态 */
 #ai-chat-navigator-sidebar.collapsed {
-  width: 50px;
+  width: 48px;
 }
 
 #ai-chat-navigator-sidebar.collapsed .navigator-search,
@@ -31,12 +62,14 @@
 }
 
 #ai-chat-navigator-sidebar.collapsed .navigator-header {
+  padding: 12px;
   justify-content: center;
-  padding: 16px 12px;
 }
 
-#ai-chat-navigator-sidebar.collapsed .toggle-btn svg {
-  transform: rotate(180deg);
+#ai-chat-navigator-sidebar.collapsed .toggle-btn {
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
 /* 头部 */
@@ -44,72 +77,84 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: #ffffff;
 }
 
 .navigator-header h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  color: #ececec;
+  color: var(--text-primary);
 }
 
+/* 切换按钮 */
 .toggle-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #b4b4b4;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 6px;
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  transition: var(--transition);
 }
 
 .toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ececec;
+  background: var(--bg-item-hover);
+  color: var(--text-primary);
 }
 
 .toggle-btn svg {
+  width: 18px;
+  height: 18px;
   transition: transform 0.3s ease;
+}
+
+#ai-chat-navigator-sidebar.collapsed .toggle-btn svg {
+  transform: rotate(180deg);
 }
 
 /* 搜索框 */
 .navigator-search {
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-color);
+  background: #ffffff;
 }
 
 .navigator-search input {
   width: 100%;
-  padding: 10px 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 8px 12px;
+  background: var(--bg-item-hover);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  color: #ececec;
+  color: var(--text-primary);
   font-size: 13px;
   outline: none;
-  transition: all 0.2s;
+  transition: var(--transition);
   box-sizing: border-box;
 }
 
 .navigator-search input::placeholder {
-  color: #9b9b9b;
+  color: var(--text-muted);
 }
 
 .navigator-search input:focus {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(99, 102, 241, 0.5);
+  background: #ffffff;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.1);
 }
 
 /* 内容区域 */
 .navigator-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 8px;
+  background: var(--bg-sidebar);
 }
 
 .navigator-content::-webkit-scrollbar {
@@ -121,52 +166,72 @@
 }
 
 .navigator-content::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 3px;
 }
 
 .navigator-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(0, 0, 0, 0.25);
 }
 
-/* 状态 */
+/* 状态提示 */
 .loading-state,
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #9b9b9b;
+  color: var(--text-muted);
   font-size: 13px;
+}
+
+.loading-state::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0 auto 12px;
+  border: 2px solid var(--border-color);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* 消息项 */
 .message-item {
   display: flex;
   gap: 10px;
-  padding: 12px;
-  margin-bottom: 6px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  background: var(--bg-item);
   border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--transition);
 }
 
 .message-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(99, 102, 241, 0.3);
-  transform: translateX(-2px);
+  background: var(--bg-item-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.message-item:active {
+  transform: translateY(0);
 }
 
 .message-index {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  background: linear-gradient(135deg, #10b981, #059669);
-  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  background: var(--accent-primary);
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: white;
 }
@@ -174,12 +239,15 @@
 .message-content {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .message-text {
-  color: #ececec;
+  color: var(--text-primary);
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.4;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -189,41 +257,33 @@
 }
 
 .message-time {
-  color: #9b9b9b;
+  color: var(--text-muted);
   font-size: 11px;
-  margin-top: 6px;
 }
 
 /* 底部 */
 .navigator-footer {
-  padding: 12px 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.2);
+  padding: 10px 16px;
+  border-top: 1px solid var(--border-color);
+  background: #ffffff;
 }
 
 .navigator-footer span {
-  color: #9b9b9b;
+  color: var(--text-muted);
   font-size: 12px;
 }
 
 /* 高亮效果 */
 .ai-nav-highlight {
-  animation: highlight-pulse 3s ease;
-  position: relative;
+  animation: highlight-flash 2s ease;
 }
 
-@keyframes highlight-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
-  }
-  10% {
-    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+@keyframes highlight-flash {
+  0%, 100% {
+    background: var(--bg-item);
   }
   50% {
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    background: var(--bg-item-active);
   }
 }
 
@@ -237,6 +297,6 @@
   }
 
   #ai-chat-navigator-sidebar.collapsed {
-    width: 50px;
+    width: 48px;
   }
 }

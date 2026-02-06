@@ -89,13 +89,13 @@ class ChatNavigator {
       <div class="navigator-header">
         <h3>对话导航</h3>
         <button id="toggle-navigator" class="toggle-btn" title="折叠/展开">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="18 15 12 9 6 15"/>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 18 9 12 15 6"/>
           </svg>
         </button>
       </div>
       <div class="navigator-search">
-        <input type="text" id="search-input" placeholder="搜索对话内容...">
+        <input type="text" id="search-input" placeholder="搜索消息内容...">
       </div>
       <div class="navigator-content" id="navigator-content">
         <div class="loading-state">正在加载对话...</div>
@@ -407,16 +407,7 @@ class ChatNavigator {
     this.isSidebarVisible = !this.isSidebarVisible;
     this.sidebar.classList.toggle('collapsed', !this.isSidebarVisible);
 
-    // 更新按钮图标
-    const toggleBtn = document.getElementById('toggle-navigator');
-    if (toggleBtn) {
-      const svg = toggleBtn.querySelector('svg');
-      if (svg) {
-        svg.innerHTML = this.isSidebarVisible
-          ? '<polyline points="18 15 12 9 6 15"/>'
-          : '<polyline points="6 9 12 15 18 9"/>';
-      }
-    }
+    // 更新按钮图标 - 不再需要，CSS已处理旋转
   }
 
   /**

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat Navigator - UI Preview</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px;
+    }
+
+    .preview-container {
+      text-align: center;
+    }
+
+    .preview-title {
+      color: #ffffff;
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .preview-subtitle {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 16px;
+      margin-bottom: 40px;
+    }
+
+    .preview-layout {
+      display: flex;
+      gap: 60px;
+      align-items: flex-start;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .preview-item {
+      text-align: center;
+    }
+
+    .preview-label {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 20px;
+    }
+  </style>
+  <link rel="stylesheet" href="src/content/style.css">
+</head>
+<body>
+  <div class="preview-container">
+    <h1 class="preview-title">AI Chat Navigator</h1>
+    <p class="preview-subtitle">简洁风格设计 - 参考 DeepSeek</p>
+
+    <div class="preview-layout">
+      <!-- 展开状态 -->
+      <div class="preview-item">
+        <div class="preview-label">展开状态</div>
+        <div id="ai-chat-navigator-sidebar">
+          <div class="navigator-header">
+            <h3>对话导航</h3>
+            <button class="toggle-btn" title="折叠/展开">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </button>
+          </div>
+          <div class="navigator-search">
+            <input type="text" placeholder="搜索消息内容...">
+          </div>
+          <div class="navigator-content">
+            <div class="message-item">
+              <div class="message-index">#1</div>
+              <div class="message-content">
+                <div class="message-text">帮我写一个Python脚本，用于批量处理CSV文件的数据清洗和转换</div>
+                <div class="message-time">刚刚</div>
+              </div>
+            </div>
+            <div class="message-item">
+              <div class="message-index">#2</div>
+              <div class="message-content">
+                <div class="message-text">如何使用React和TypeScript搭建一个企业级的前端项目架构？</div>
+                <div class="message-time">5分钟前</div>
+              </div>
+            </div>
+            <div class="message-item">
+              <div class="message-index">#3</div>
+              <div class="message-content">
+                <div class="message-text">解释一下什么是微服务架构，以及它和单体架构的区别和优缺点</div>
+                <div class="message-time">15分钟前</div>
+              </div>
+            </div>
+            <div class="message-item">
+              <div class="message-index">#4</div>
+              <div class="message-content">
+                <div class="message-text">帮我优化这段JavaScript代码的性能，特别是大数据量处理的部分</div>
+                <div class="message-time">1小时前</div>
+              </div>
+            </div>
+            <div class="message-item">
+              <div class="message-index">#5</div>
+              <div class="message-content">
+                <div class="message-text">如何在Docker容器中部署一个Node.js的Express应用？</div>
+                <div class="message-time">2小时前</div>
+              </div>
+            </div>
+          </div>
+          <div class="navigator-footer">
+            <span>5 条消息</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 折叠状态 -->
+      <div class="preview-item">
+        <div class="preview-label">折叠状态</div>
+        <div id="ai-chat-navigator-sidebar-2" class="collapsed" style="position: relative;">
+          <div class="navigator-header">
+            <button class="toggle-btn" title="折叠/展开">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 添加交互效果
+    document.querySelectorAll('.message-item').forEach(item => {
+      item.addEventListener('click', () => {
+        item.style.background = '#e4edfd';
+        setTimeout(() => {
+          item.style.background = '';
+        }, 300);
+      });
+    });
+  </script>
+</body>
+</html>
