@@ -1,0 +1,18 @@
+{
+  "name": "ai-chat-navigator",
+  "version": "1.1.0",
+  "description": "在ChatGPT页面中快速导航和定位历史对话的浏览器插件",
+  "scripts": {
+    "build": "echo \"打包扩展...\"",
+    "test": "echo \"测试功能...\""
+  },
+  "keywords": [
+    "chatgpt",
+    "chrome-extension",
+    "navigation",
+    "history",
+    "ai-chat"
+  ],
+  "author": "",
+  "license": "MIT"
+}

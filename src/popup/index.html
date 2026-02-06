@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Chat Navigator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="popup-container">
+    <div class="popup-header">
+      <div class="logo">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+      </div>
+      <h1>AI Chat Navigator</h1>
+      <span class="version">v1.0.0</span>
+    </div>
+
+    <div class="popup-content">
+      <div class="status-card">
+        <div class="status-icon active">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 6v6l4 2"/>
+          </svg>
+        </div>
+        <div class="status-info">
+          <h3>插件状态</h3>
+          <p id="status-text">正在检测ChatGPT页面...</p>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h2>功能说明</h2>
+        <ul class="features-list">
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>自动记录对话历史</span>
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>快速定位到任意消息</span>
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>搜索和过滤对话内容</span>
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>快捷键操作（Alt+N, Alt+S）</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="shortcuts-section">
+        <h2>快捷键</h2>
+        <div class="shortcut-item">
+          <kbd>Alt</kbd> + <kbd>N</kbd>
+          <span>切换导航栏</span>
+        </div>
+        <div class="shortcut-item">
+          <kbd>Alt</kbd> + <kbd>S</kbd>
+          <span>聚焦搜索框</span>
+        </div>
+      </div>
+
+      <div class="stats-section">
+        <h2>统计信息</h2>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-value" id="total-conversations">0</span>
+            <span class="stat-label">对话数</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="total-messages">0</span>
+            <span class="stat-label">消息数</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="popup-footer">
+      <button id="open-chatgpt" class="btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+          <polyline points="15 3 21 3 21 9"/>
+          <line x1="10" y1="14" x2="21" y2="3"/>
+        </svg>
+        打开 ChatGPT
+      </button>
+      <button id="clear-data" class="btn-secondary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
+        清除数据
+      </button>
+    </div>
+  </div>
+
+  <script src="index.js"></script>
+</body>
+</html>

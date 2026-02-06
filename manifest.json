@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "AI Chat Navigator",
+  "version": "1.1.0",
+  "description": "在ChatGPT页面中快速导航和定位历史对话",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://chat.openai.com/*",
+    "https://chatgpt.com/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chat.openai.com/*",
+        "https://chatgpt.com/*"
+      ],
+      "js": ["src/content/index.js"],
+      "css": ["src/content/style.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "background": {
+    "service_worker": "src/background/index.js"
+  },
+  "action": {
+    "default_popup": "src/popup/index.html"
+  }
+}
