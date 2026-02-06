@@ -14,6 +14,7 @@ class ChatNavigator {
     this.expandMode = 'hover'; // 展开方式: 'hover' 或 'click'，默认hover
     this.hoverTimer = null; // hover延迟计时器
     this.collapseTimer = null; // 折叠延迟计时器
+    this.pluginEnabled = true; // 插件是否启用
     this.init();
   }
 
@@ -29,6 +30,9 @@ class ChatNavigator {
    * 检查并处理对话切换
    */
   checkConversationChange() {
+    // 如果插件被禁用，不处理对话切换
+    if (!this.pluginEnabled) return;
+
     const newConversationId = this.extractConversationId();
 
     if (newConversationId !== this.currentConversationId) {
@@ -43,6 +47,12 @@ class ChatNavigator {
 
     // 加载配置
     await this.loadSettings();
+
+    // 如果插件被禁用，不创建侧边栏
+    if (!this.pluginEnabled) {
+      console.log('[AI Chat Navigator] 插件已禁用');
+      return;
+    }
 
     // 等待页面加载完成
     await this.waitForChatContainer();
@@ -63,6 +73,9 @@ class ChatNavigator {
 
     // 监听快捷键
     this.setupKeyboardShortcuts();
+
+    // 监听来自popup的消息
+    this.setupMessageListener();
 
     console.log('[AI Chat Navigator] 初始化完成');
   }
@@ -251,6 +264,11 @@ class ChatNavigator {
    * 重置状态（当切换对话时调用）
    */
   resetState() {
+    // 如果插件被禁用或侧边栏不存在，不执行重置
+    if (!this.pluginEnabled || !this.sidebar) {
+      return;
+    }
+
     // 清空消息列表
     this.messages = [];
 
@@ -278,6 +296,9 @@ class ChatNavigator {
    * 扫描页面中已存在的消息
    */
   scanExistingMessages() {
+    // 如果插件被禁用，不扫描消息
+    if (!this.pluginEnabled) return;
+
     const articles = document.querySelectorAll('main article');
     const newMessages = [];
 
@@ -341,7 +362,6 @@ class ChatNavigator {
       type: 'user', // 只有用户消息
       text: content.substring(0, 150) + (content.length > 150 ? '...' : ''),
       fullText: content,
-      timestamp: new Date().toISOString(),
       index: this.messages.length
     };
   }
@@ -405,13 +425,12 @@ class ChatNavigator {
     }
 
     content.innerHTML = this.messages.map((msg, idx) => {
-      // 只显示序号，不显示图标和类型标签
+      // 只显示序号，不显示图标和类型标签，移除时间显示，移除井号
       return `
         <div class="message-item" data-message-id="${msg.id}" data-index="${idx}">
-          <div class="message-index">#${idx + 1}</div>
+          <div class="message-index">${idx + 1}</div>
           <div class="message-content">
             <div class="message-text">${this.escapeHtml(msg.text)}</div>
-            <div class="message-time">${this.formatTime(msg.timestamp)}</div>
           </div>
         </div>
       `;
@@ -443,14 +462,26 @@ class ChatNavigator {
     const element = document.getElementById(message.elementId);
     if (!element) return;
 
-    // 滚动到元素
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // 判断是否是最后一条消息
+    const isLastMessage = message.index === this.messages.length - 1;
 
-    // 高亮效果
-    element.classList.add('ai-nav-highlight');
+    // 延迟执行滚动，确保 DOM 完全渲染
     setTimeout(() => {
-      element.classList.remove('ai-nav-highlight');
-    }, 3000);
+      // 根据是否是最后一条消息使用不同的滚动策略
+      if (isLastMessage) {
+        // 对于最后一条消息，使用 end 策略，确保滚动到视口底部
+        element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      } else {
+        // 对于其他消息，使用 center 策略
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      // 高亮效果
+      element.classList.add('ai-nav-highlight');
+      setTimeout(() => {
+        element.classList.remove('ai-nav-highlight');
+      }, 3000);
+    }, 100);
   }
 
   /**
@@ -483,6 +514,9 @@ class ChatNavigator {
    * 切换侧边栏显示
    */
   toggleSidebar() {
+    // 如果侧边栏不存在或插件被禁用，不执行切换
+    if (!this.sidebar || !this.pluginEnabled) return;
+
     this.isSidebarVisible = !this.isSidebarVisible;
     this.sidebar.classList.toggle('collapsed', !this.isSidebarVisible);
 
@@ -494,6 +528,9 @@ class ChatNavigator {
    */
   setupKeyboardShortcuts() {
     document.addEventListener('keydown', (e) => {
+      // 如果插件被禁用，不响应快捷键
+      if (!this.pluginEnabled) return;
+
       // Alt + N: 切换导航栏
       if (e.altKey && e.key === 'n') {
         e.preventDefault();
@@ -506,26 +543,6 @@ class ChatNavigator {
         const searchInput = document.getElementById('search-input');
         searchInput?.focus();
       }
-    });
-  }
-
-  /**
-   * 格式化时间
-   */
-  formatTime(timestamp) {
-    const date = new Date(timestamp);
-    const now = new Date();
-    const diff = now - date;
-
-    if (diff < 60000) return '刚刚';
-    if (diff < 3600000) return `${Math.floor(diff / 60000)}分钟前`;
-    if (diff < 86400000) return `${Math.floor(diff / 3600000)}小时前`;
-
-    return date.toLocaleDateString('zh-CN', {
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
     });
   }
 
@@ -543,14 +560,60 @@ class ChatNavigator {
    */
   async loadSettings() {
     try {
-      const result = await chrome.storage.local.get('expandMode');
+      const result = await chrome.storage.local.get(['expandMode', 'pluginEnabled']);
+
       if (result.expandMode && ['hover', 'click'].includes(result.expandMode)) {
         this.expandMode = result.expandMode;
         console.log('[AI Chat Navigator] 展开模式:', this.expandMode);
       }
+
+      if (result.pluginEnabled !== undefined) {
+        this.pluginEnabled = result.pluginEnabled;
+        console.log('[AI Chat Navigator] 插件状态:', this.pluginEnabled ? '启用' : '禁用');
+      }
     } catch (error) {
       console.error('[AI Chat Navigator] 加载设置失败:', error);
     }
+  }
+
+  /**
+   * 监听来自popup的消息
+   */
+  setupMessageListener() {
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+      if (request.action === 'togglePlugin') {
+        const { enabled } = request;
+        this.pluginEnabled = enabled;
+
+        if (enabled) {
+          // 重新初始化或显示侧边栏
+          if (!this.sidebar) {
+            // 如果侧边栏不存在，重新初始化
+            this.waitForChatContainer().then(() => {
+              this.createSidebar();
+              setTimeout(() => {
+                this.scanExistingMessages();
+              }, 1000);
+              this.observeMessages();
+            });
+          } else {
+            // 如果侧边栏已存在，直接显示
+            this.sidebar.style.display = 'flex';
+          }
+          console.log('[AI Chat Navigator] 插件已启用');
+        } else {
+          // 移除侧边栏（不仅仅是隐藏）
+          if (this.sidebar) {
+            this.sidebar.remove();
+            this.sidebar = null;
+          }
+          console.log('[AI Chat Navigator] 插件已禁用');
+        }
+
+        sendResponse({ success: true });
+      }
+      return true;
+    });
   }
 }
 

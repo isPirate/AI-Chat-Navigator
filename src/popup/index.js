@@ -2,28 +2,7 @@
  * AI Chat Navigator - Popup Script
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-  initializePopup();
-});
-
-function initializePopup() {
-  // 检查ChatGPT页面状态
-  checkChatGPTStatus();
-
-  // 加载设置
-  loadSettings();
-
-  // 绑定按钮事件
-  document.getElementById('open-chatgpt').addEventListener('click', openChatGPT);
-  document.getElementById('clear-data').addEventListener('click', clearAllData);
-
-  // 绑定设置变更事件
-  document.getElementById('expand-mode-select').addEventListener('change', saveExpandMode);
-}
-
-/**
- * 检查ChatGPT页面状态
- */
+// 定义所有函数（确保在调用前定义）
 async function checkChatGPTStatus() {
   try {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -51,54 +30,33 @@ async function checkChatGPTStatus() {
   }
 }
 
-/**
- * 打开ChatGPT
- */
 function openChatGPT() {
   chrome.tabs.create({ url: 'https://chat.openai.com/' });
 }
 
-/**
- * 清除所有数据
- */
-async function clearAllData() {
-  const confirmed = confirm('确定要清除所有对话记录吗？此操作不可恢复。');
-  if (!confirmed) return;
-
-  try {
-    const allData = await chrome.storage.local.get(null);
-    const keysToRemove = Object.keys(allData).filter(key => key.startsWith('conversation_'));
-
-    await chrome.storage.local.remove(keysToRemove);
-
-    // 显示成功提示
-    alert('数据已清除');
-  } catch (error) {
-    console.error('[AI Chat Navigator] 清除数据失败:', error);
-    alert('清除数据失败，请重试');
-  }
-}
-
-/**
- * 加载设置
- */
 async function loadSettings() {
   try {
-    const result = await chrome.storage.local.get('expandMode');
-    const expandMode = result.expandMode || 'hover'; // 默认hover
+    const result = await chrome.storage.local.get(['expandMode', 'pluginEnabled']);
 
+    // 加载展开方式
+    const expandMode = result.expandMode || 'hover';
     const select = document.getElementById('expand-mode-select');
     if (select) {
       select.value = expandMode;
+    }
+
+    // 加载插件启用状态
+    const pluginEnabled = result.pluginEnabled !== undefined ? result.pluginEnabled : true;
+    const checkbox = document.getElementById('plugin-enabled');
+    if (checkbox) {
+      checkbox.checked = pluginEnabled;
+      updatePluginStatusUI(pluginEnabled);
     }
   } catch (error) {
     console.error('[AI Chat Navigator] 加载设置失败:', error);
   }
 }
 
-/**
- * 保存展开方式
- */
 async function saveExpandMode(event) {
   const expandMode = event.target.value;
 
@@ -114,22 +72,78 @@ async function saveExpandMode(event) {
   }
 }
 
-/**
- * 显示保存成功提示
- */
+async function togglePlugin(event) {
+  const enabled = event.target.checked;
+
+  try {
+    await chrome.storage.local.set({ pluginEnabled: enabled });
+    updatePluginStatusUI(enabled);
+
+    // 通知content script更新状态
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab && (tab.url.includes('chat.openai.com') || tab.url.includes('chatgpt.com'))) {
+      chrome.tabs.sendMessage(tab.id, { action: 'togglePlugin', enabled });
+    }
+
+    // 显示保存成功提示
+    showNotification(enabled ? '插件已启用' : '插件已禁用');
+  } catch (error) {
+    console.error('[AI Chat Navigator] 切换插件状态失败:', error);
+    alert('操作失败，请重试');
+  }
+}
+
+function updatePluginStatusUI(enabled) {
+  const statusIcon = document.getElementById('plugin-status-icon');
+  const statusText = document.getElementById('status-text');
+  const toggleLabel = document.querySelector('.toggle-label');
+
+  if (enabled) {
+    statusIcon.classList.remove('inactive');
+    statusIcon.classList.add('active');
+    statusText.textContent = '插件已激活，正在记录对话';
+    toggleLabel.textContent = '启用';
+  } else {
+    statusIcon.classList.remove('active');
+    statusIcon.classList.add('inactive');
+    statusText.textContent = '插件已禁用';
+    toggleLabel.textContent = '已禁用';
+  }
+}
+
+function showNotification(message) {
+  const notification = document.createElement('div');
+  notification.className = 'toast-notification';
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 2000);
+}
+
 function showSaveNotification(settingItem) {
-  // 移除已存在的通知
   const existing = settingItem.querySelector('.save-notification');
   if (existing) existing.remove();
 
-  // 创建通知
   const notification = document.createElement('div');
   notification.className = 'save-notification';
   notification.textContent = '✓ 已保存';
   settingItem.appendChild(notification);
 
-  // 2秒后移除
   setTimeout(() => {
     notification.remove();
   }, 2000);
 }
+
+function initializePopup() {
+  checkChatGPTStatus();
+  loadSettings();
+
+  document.getElementById('open-chatgpt').addEventListener('click', openChatGPT);
+  document.getElementById('expand-mode-select').addEventListener('change', saveExpandMode);
+  document.getElementById('plugin-enabled').addEventListener('change', togglePlugin);
+}
+
+// DOM加载完成后初始化
+document.addEventListener('DOMContentLoaded', initializePopup);

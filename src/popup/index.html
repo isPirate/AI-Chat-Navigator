@@ -20,7 +20,7 @@
 
     <div class="popup-content">
       <div class="status-card">
-        <div class="status-icon active">
+        <div class="status-icon active" id="plugin-status-icon">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
             <circle cx="12" cy="12" r="10"/>
             <path d="M12 6v6l4 2"/>
@@ -29,6 +29,13 @@
         <div class="status-info">
           <h3>插件状态</h3>
           <p id="status-text">正在检测ChatGPT页面...</p>
+        </div>
+        <div class="plugin-toggle">
+          <label class="switch">
+            <input type="checkbox" id="plugin-enabled" checked>
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">启用</span>
         </div>
       </div>
 
@@ -99,13 +106,6 @@
           <line x1="10" y1="14" x2="21" y2="3"/>
         </svg>
         打开 ChatGPT
-      </button>
-      <button id="clear-data" class="btn-secondary">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <polyline points="3 6 5 6 21 6"/>
-          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-        </svg>
-        清除数据
       </button>
     </div>
   </div>

@@ -10,7 +10,9 @@
       "mcp__chrome-devtools__list_console_messages",
       "mcp__chrome-devtools__evaluate_script",
       "mcp__chrome-devtools__fill",
-      "mcp__zai-mcp-server__ui_to_artifact"
+      "mcp__zai-mcp-server__ui_to_artifact",
+      "Bash(node:*)",
+      "mcp__chrome-devtools__wait_for"
     ]
   }
 }
